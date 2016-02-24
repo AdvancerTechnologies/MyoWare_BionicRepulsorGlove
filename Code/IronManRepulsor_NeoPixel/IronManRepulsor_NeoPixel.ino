@@ -83,124 +83,6 @@ long brightnessValue = 1;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(12, NeoPixelPin, NEO_GRB + NEO_KHZ800);
 
-void setup()
-{
-  //***************************************************************************
-  // Example code from Trigger.ino a sketch for Lilypad MP3 Player
-  //***************************************************************************
-  int x, index;
-  SdFile file;
-  byte result;
-  char tempfilename[13];
-
-  // Setup the five trigger pins 
-  for (x = 0; x <= 4; x++)
-  {
-    pinMode(trigger[x],INPUT);
-    if(x > 0)
-      digitalWrite(trigger[x],HIGH);
-  }
-  //***************************************************************************
-  
-  // Setup the repulsor LED PWM pin 
-  pinMode(NeoPixelPin, OUTPUT); 
-  
-  //
-  SetupMP3Player();
-  
-  delay(20);
-}
-
-void loop()
-{  
-  if(firstLoop)
-  {
-    // First time through we want the JARVIS SFXs to play
-    // Play the JARVIS "Importing Preferences" SFX
-    MP3player.playMP3(filename[5]);
-    
-    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, 0);}
-    int pixelIndex = 0;
-    int colorIndex = 0;
-    while (MP3player.isPlaying())
-    {
-      // This code creates a fluctuating comet that travels around
-      // the NeoPixel ring varying brightness and color
-      int numCluster = 3;        //change this value to set the comet tail length
-      bool fwdColor = true;     
-      const int colorInc = 5;  
-      
-      // turn on leading NeoPixel
-      strip.setBrightness(20);
-      strip.setPixelColor(pixelIndex, Wheel(colorIndex % 255));      
-      // turn off trailing NeoPixels
-      if(pixelIndex-numCluster >= 0)
-        strip.setPixelColor(pixelIndex-numCluster, 0);       
-      else
-        strip.setPixelColor(strip.numPixels() + (pixelIndex-numCluster), 0);         
-      strip.show();
-  
-      IncrementAndDirection(colorIndex, 0, 255, 5, fwdColor);     // color: min=0, max=255, increment=5
-      pixelIndex++;  
-  
-      if(pixelIndex > strip.numPixels())
-        pixelIndex = 0;
-  
-      delay(50);  
-    }	
-    
-    // turn all NeoPixels off
-    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, 0);}
-    
-    //Play the JARVIS "Online and Ready" SFX
-    MP3player.playMP3(filename[6]);
-    
-    // color wipe green
-    int brightIndex = 20;
-    strip.setBrightness(brightIndex);
-    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, strip.Color(0, 127, 0));strip.show();delay(50);}          
-    
-    bool fwdBright = false;         
-    while (MP3player.isPlaying())
-    {
-      strip.setBrightness(brightIndex);
-      for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, strip.Color(0, 127, 0));}    
-      strip.show();
-  
-      IncrementAndDirection(brightIndex, 3, 20, 1, fwdBright);   // brightness: min=1, max=255
-      delay(25);  
-    }
-    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, 0);strip.show();delay(50);}          
-    firstLoop = false;
-  }
-  
-  // Read the muscle sensor value
-  boolean bState = ReadMuscleSensor(TRIG1);
-
-  // If the muscle sensor value is over the threshold (bState = true)
-  // and the previous state was below the threshold, then play the
-  // power up SFX. If the muscle sensor goes back below the threshold,
-  // then play the fire SFX and turn the repulsor on while the SFX is
-  // playing and the power down SFX afterwards.
-  if(bState && !bPreviousState)
-  {
-    //digitalWrite(NeoPixelPin, HIGH);	// Turn the repulsor on when flexing
-    powerUp();		                // Play the Repulsor Power Up SFX
-  }
-  else if(!bState && bPreviousState)
-  {
-    //digitalWrite(NeoPixelPin, LOW);	// Turn the repulsor off when relaxed    
-    fire();				// Play the Repulsor Firing and Power Down SFXs    
-  }
-
-  // Store state for next loop
-  bPreviousState = bState;  
-  
-  // Check to see
-  ReadMP3PlayerTriggers();
-  
-  delay(50);
-}
 
 //----------------------------------------------------------------------------
 //
@@ -540,5 +422,125 @@ uint32_t Wheel(byte WheelPos) {
     WheelPos -= 170;
     return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
   }
+}
+
+
+void setup()
+{
+  //***************************************************************************
+  // Example code from Trigger.ino a sketch for Lilypad MP3 Player
+  //***************************************************************************
+  int x, index;
+  SdFile file;
+  byte result;
+  char tempfilename[13];
+
+  // Setup the five trigger pins 
+  for (x = 0; x <= 4; x++)
+  {
+    pinMode(trigger[x],INPUT);
+    if(x > 0)
+      digitalWrite(trigger[x],HIGH);
+  }
+  //***************************************************************************
+  
+  // Setup the repulsor LED PWM pin 
+  pinMode(NeoPixelPin, OUTPUT); 
+  
+  //
+  SetupMP3Player();
+  
+  delay(20);
+}
+
+void loop()
+{  
+  if(firstLoop)
+  {
+    // First time through we want the JARVIS SFXs to play
+    // Play the JARVIS "Importing Preferences" SFX
+    MP3player.playMP3(filename[5]);
+    
+    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, 0);}
+    int pixelIndex = 0;
+    int colorIndex = 0;
+    while (MP3player.isPlaying())
+    {
+      // This code creates a fluctuating comet that travels around
+      // the NeoPixel ring varying brightness and color
+      int numCluster = 3;        //change this value to set the comet tail length
+      bool fwdColor = true;     
+      const int colorInc = 5;  
+      
+      // turn on leading NeoPixel
+      strip.setBrightness(20);
+      strip.setPixelColor(pixelIndex, Wheel(colorIndex % 255));      
+      // turn off trailing NeoPixels
+      if(pixelIndex-numCluster >= 0)
+        strip.setPixelColor(pixelIndex-numCluster, 0);       
+      else
+        strip.setPixelColor(strip.numPixels() + (pixelIndex-numCluster), 0);         
+      strip.show();
+  
+      IncrementAndDirection(colorIndex, 0, 255, 5, fwdColor);     // color: min=0, max=255, increment=5
+      pixelIndex++;  
+  
+      if(pixelIndex > strip.numPixels())
+        pixelIndex = 0;
+  
+      delay(50);  
+    }  
+    
+    // turn all NeoPixels off
+    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, 0);}
+    
+    //Play the JARVIS "Online and Ready" SFX
+    MP3player.playMP3(filename[6]);
+    
+    // color wipe green
+    int brightIndex = 20;
+    strip.setBrightness(brightIndex);
+    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, strip.Color(0, 127, 0));strip.show();delay(50);}          
+    
+    bool fwdBright = false;         
+    while (MP3player.isPlaying())
+    {
+      strip.setBrightness(brightIndex);
+      for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, strip.Color(0, 127, 0));}    
+      strip.show();
+  
+      IncrementAndDirection(brightIndex, 3, 20, 1, fwdBright);   // brightness: min=1, max=255
+      delay(25);  
+    }
+    for(int i=0; i<strip.numPixels(); i++) {strip.setPixelColor(i, 0);strip.show();delay(50);}          
+    firstLoop = false;
+  }
+  
+  // Read the muscle sensor value
+  boolean bState = ReadMuscleSensor(TRIG1);
+
+  // If the muscle sensor value is over the threshold (bState = true)
+  // and the previous state was below the threshold, then play the
+  // power up SFX. If the muscle sensor goes back below the threshold,
+  // then play the fire SFX and turn the repulsor on while the SFX is
+  // playing and the power down SFX afterwards.
+  if(bState && !bPreviousState)
+  {
+    //digitalWrite(NeoPixelPin, HIGH);  // Turn the repulsor on when flexing
+    powerUp();                    // Play the Repulsor Power Up SFX
+  }
+  else if(!bState && bPreviousState)
+  {
+    //digitalWrite(NeoPixelPin, LOW); // Turn the repulsor off when relaxed    
+    fire();       // Play the Repulsor Firing and Power Down SFXs    
+  }
+
+  // Store state for next loop
+  bPreviousState = bState;  
+  
+  // Check to see
+  ReadMP3PlayerTriggers();
+  
+  delay(50);
 }
 //***************************************************************************
