@@ -350,7 +350,7 @@ void FindAudioFilenames()
   while (file.openNext(sd.vwd(),O_READ))
   {
     // get filename
-    file.getFilename(tempfilename);
+    file.getName(tempfilename, 13);
 
     // Does the filename start with char '1' through '10'?
     if (tempfilename[0] >= '1' && tempfilename[0] <= '10')

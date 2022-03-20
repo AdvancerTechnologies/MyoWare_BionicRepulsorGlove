@@ -31,6 +31,7 @@
 #include <SdFat.h>              // SD card file system
 #include <SFEMP3Shield.h>       // MP3 decoder chip
 #include <Adafruit_NeoPixel.h>  // NeoPixel library
+#include <Arduino.h>
 
 // Constants for the trigger input pins, which we'll place
 // in an array for convenience:
@@ -301,7 +302,7 @@ void FindAudioFilenames()
   while (file.openNext(sd.vwd(),O_READ))
   {
     // get filename
-    file.getFilename(tempfilename);
+    file.getName(tempfilename, 13);
 
     // Does the filename start with char '1' through '10'?
     if (tempfilename[0] >= '1' && tempfilename[0] <= '10')
